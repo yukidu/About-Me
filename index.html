@@ -1,189 +1,146 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Menu, X, Globe, Heart, Award, BookOpen, MapPin, Wine, Star, Anchor } from 'lucide-react';
-
-const App = () => {
-  const [currentPage, setCurrentPage] = useState(0);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(null);
-
-  // 頁面定義 (共 22 頁，滿足 20 頁以上需求)
-  const pages = [
-    // --- 首頁 ---
-    { id: 'hero', category: 'Home', title: 'DU DU LONG', subtitle: '一個關於跨界、健康與夢想的非凡展覽', bg: 'bg-zinc-950', type: 'hero' },
-    
-    // --- 類別 1: 生平故事 (Cat: Story) ---
-    { id: 'story-1', category: 'Story', title: '學術的起點', content: '曾任大學資管系教師，在程式碼與教學中，鍛鍊出系統化思考的嚴謹基礎。', highlight: 'IT 專業背景', bg: 'bg-white' },
-    { id: 'story-2', category: 'Story', title: '創業的勇氣', content: '白手起家，創立第一間印刷店。在紙張與油墨之間，體驗商業社會的真實律動。', highlight: '初次創業', bg: 'bg-zinc-50' },
-    { id: 'story-3', category: 'Story', title: '版圖的擴張', content: '最高紀錄同時管理三家連鎖印刷店，獲選傑出校友，這是一段關於效率與意志的證明。', highlight: '連鎖管理', bg: 'bg-white' },
-    { id: 'story-4', category: 'Story', title: '轉折點：杜阿嬤', content: '為了守護 90 歲杜阿嬤（杜許彩鑾）的健康，我開始反思人生的下半場。', highlight: '家族守護', bg: 'bg-zinc-100' },
-    { id: 'story-5', category: 'Story', title: '新生的覺醒', content: '從資管老師到健康管理師，這不只是職業的變換，更是生命意義的昇華。', highlight: '跨界蛻變', bg: 'bg-white' },
-
-    // --- 類別 2: 專業成就 (Cat: Professional) ---
-    { id: 'prof-1', category: 'Professional', title: '北醫健康管理師', content: '取得台北醫學大學專業認證，將資管的精準精神帶入預防醫學領域。', highlight: '專業證照', bg: 'bg-zinc-50' },
-    { id: 'prof-2', category: 'Professional', title: '代理紐崔萊', content: '選擇全球領先的營養補充品牌，不僅是商業代理，更是健康價值的傳遞。', highlight: '全球領導品牌', bg: 'bg-white' },
-    { id: 'prof-3', category: 'Professional', title: '91 年的科研底蘊', content: '深信紐崔萊科學溯源的精神，從種子到成品，每一環節都是嚴謹的承諾。', highlight: '科學與自然', bg: 'bg-zinc-100' },
-    { id: 'prof-4', category: 'Professional', title: '有機農場的堅持', content: '代理自有有機農場的精華，確保每一份營養都來自於純淨的大地。', highlight: '永續經營', bg: 'bg-white' },
-    { id: 'prof-5', category: 'Professional', title: '健康社群領導', content: '帶領夥伴走向健康，將個人成就轉化為群體的福祉。', highlight: '團隊願景', bg: 'bg-zinc-50' },
-
-    // --- 類別 3: 海外亮點 (Cat: Travel) - 重點亮點 ---
-    { id: 'travel-1', category: 'Travel', title: '寰宇世界：生活的藝術', content: '選擇安麗，等於選擇了一種極致的生活方式。我們不只是旅遊，是在體驗人生。', highlight: '亮點主題', bg: 'bg-zinc-900', textColor: 'text-white' },
-    { id: 'travel-2', category: 'Travel', title: '西澳珀斯：酒莊晚宴', content: '在頂級酒莊包場用餐，微醺的夕陽下，感受大地的饋贈與生活的優雅。', icon: <Wine className="w-12 h-12 mb-4 text-[#c5a059]" />, bg: 'bg-zinc-800', textColor: 'text-white' },
-    { id: 'travel-3', category: 'Travel', title: '西澳珀斯：挑戰高度', content: '驚險的高空滑索挑戰，跨越心理障礙，這就是我們面對人生的態度。', icon: <Star className="w-12 h-12 mb-4 text-[#c5a059]" />, bg: 'bg-zinc-900', textColor: 'text-white' },
-    { id: 'travel-4', category: 'Travel', title: '榮耀見證：專屬黃金幣', content: '獲贈客製化黃金紀念幣，這份尊榮是金錢買不到的認可。', highlight: '獨家禮遇', bg: 'bg-zinc-800', textColor: 'text-white' },
-    { id: 'travel-5', category: 'Travel', title: '巴黎：凡爾賽仲夏夜', content: '在凡爾賽宮包場舉辦皇家晚宴，這是我人生中最震撼的浪漫篇章。', icon: <Globe className="w-12 h-12 mb-4 text-[#c5a059]" />, bg: 'bg-zinc-900', textColor: 'text-white' },
-    { id: 'travel-6', category: 'Travel', title: '巴黎：塞納河酒香', content: '在塞納河畔輕舉杯，五星級飯店的專屬驚喜，處處體現對極致的追求。', highlight: '法式浪漫', bg: 'bg-zinc-800', textColor: 'text-white' },
-
-    // --- 類別 4: 健康願景 (Cat: Vision) ---
-    { id: 'vision-1', category: 'Vision', title: '小水滴與大海', content: '小水滴要不被蒸發，就要融入大海。個人力量有限，系統力量無限。', icon: <Anchor className="w-12 h-12 mb-4 text-zinc-900" />, bg: 'bg-white' },
-    { id: 'vision-2', category: 'Vision', title: '守護家人的願景', content: '因為愛，我們學習營養；因為健康，我們擁有自由。', highlight: '愛的傳承', bg: 'bg-zinc-50' },
-    { id: 'vision-3', category: 'Vision', title: '夢想與忙碌', content: '要為夢想而忙碌，不要因忙碌而忘記夢想。找回生活的主動權。', highlight: '人生哲學', bg: 'bg-white' },
-    { id: 'vision-4', category: 'Vision', title: '共創健康未來', content: '誠摯邀請您，與杜杜龍一同出走，看見世界，也看見更好的自己。', highlight: '行動呼籲', bg: 'bg-zinc-100' },
-    { id: 'contact', category: 'Vision', title: '聯繫杜杜龍', content: '期待與您交流，共同探索非凡的人生意義。', type: 'contact', bg: 'bg-zinc-950', textColor: 'text-white' },
-  ];
-
-  const categories = [
-    { name: '生平故事', cat: 'Story' },
-    { name: '專業成就', cat: 'Professional' },
-    { name: '海外亮點', cat: 'Travel' },
-    { name: '健康願景', cat: 'Vision' },
-  ];
-
-  const nextPage = () => setCurrentPage((prev) => Math.min(prev + 1, pages.length - 1));
-  const prevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 0));
-
-  const goToCategory = (cat) => {
-    const index = pages.findIndex(p => p.category === cat);
-    if (index !== -1) {
-      setCurrentPage(index);
-      setIsMenuOpen(false);
-    }
-  };
-
-  const currentPageData = pages[currentPage];
-
-  return (
-    <div className={`min-h-screen transition-colors duration-1000 ${currentPageData.bg} ${currentPageData.textColor || 'text-zinc-900'} overflow-hidden font-sans select-none`}>
-      
-      {/* 導覽列 */}
-      <nav className="fixed top-0 w-full z-50 p-6 flex justify-between items-center mix-blend-difference text-white">
-        <div className="text-xl font-bold tracking-[0.3em] font-serif cursor-pointer" onClick={() => setCurrentPage(0)}>
-          DU DU LONG
-        </div>
-        <button onClick={() => setIsMenuOpen(true)} className="p-2">
-          <Menu className="w-8 h-8" />
-        </button>
-      </nav>
-
-      {/* 側邊全螢幕選單 */}
-      <div className={`fixed inset-0 z-[100] bg-zinc-950 text-white transition-transform duration-700 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <button onClick={() => setIsMenuOpen(false)} className="absolute top-8 right-8 p-2">
-          <X className="w-10 h-10" />
-        </button>
-        <div className="flex flex-col h-full justify-center px-12 md:px-32">
-          <div className="text-xs tracking-[0.5em] text-zinc-500 mb-8 uppercase">Exhibition Menu</div>
-          <div className="space-y-8">
-            {categories.map((c, i) => (
-              <div 
-                key={i} 
-                onClick={() => goToCategory(c.cat)}
-                className="group cursor-pointer flex items-center gap-6"
-              >
-                <span className="text-zinc-700 group-hover:text-[#c5a059] transition-colors font-serif italic text-2xl">0{i+1}</span>
-                <span className="text-5xl md:text-7xl font-serif font-bold group-hover:translate-x-4 transition-transform duration-500">{c.name}</span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-20 pt-10 border-t border-zinc-800 text-sm text-zinc-500 tracking-widest">
-            DU DU LONG | PERSONAL BRAND EXHIBITION
-          </div>
-        </div>
-      </div>
-
-      {/* 進度條 */}
-      <div className="fixed top-0 left-0 h-1 bg-[#c5a059] transition-all duration-500 z-[60]" style={{ width: `${((currentPage + 1) / pages.length) * 100}%` }}></div>
-
-      {/* 內容顯示區 */}
-      <main className="h-screen w-full flex flex-col justify-center items-center px-6 md:px-20 relative">
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DU DU LONG | 杜杜龍 - 個人品牌展覽</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #c5a059; --bg: #fdfdfd; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg); overflow: hidden; }
+        .serif { font-family: 'Noto Serif TC', serif; }
         
-        {/* 背景大字 (藝術感) */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[15vw] font-serif font-black opacity-[0.03] whitespace-nowrap pointer-events-none uppercase">
-          {currentPageData.category}
-        </div>
+        /* 頁面切換動畫 */
+        .page { 
+            position: absolute; inset: 0; opacity: 0; pointer-events: none; 
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+            transform: translateY(20px);
+        }
+        .page.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
 
-        {/* 頁面內容切換動畫容器 */}
-        <div key={currentPage} className="max-w-4xl w-full animate-in fade-in slide-in-from-bottom-10 duration-1000">
-          
-          {currentPageData.type === 'hero' ? (
-            <div className="text-center space-y-10">
-              <div className="text-xs tracking-[0.8em] text-[#c5a059] uppercase mb-4">杜杜龍個人品牌展覽</div>
-              <h1 className="text-7xl md:text-9xl font-serif font-bold tracking-tight text-white">{currentPageData.title}</h1>
-              <p className="text-xl md:text-2xl text-zinc-400 font-light tracking-widest">{currentPageData.subtitle}</p>
-              <div className="pt-10">
-                <button onClick={nextPage} className="border border-[#c5a059] text-[#c5a059] px-12 py-4 text-xs tracking-[0.4em] hover:bg-[#c5a059] hover:text-white transition-all duration-500">
-                  開始觀賞展覽
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col md:flex-row gap-12 items-start">
-              <div className="md:w-1/3 flex flex-col gap-4">
-                <div className="text-xs tracking-[0.4em] text-[#c5a059] uppercase opacity-80">{currentPageData.category} / PAGE {currentPage + 1}</div>
-                <h2 className="text-4xl md:text-6xl font-serif font-bold leading-tight">{currentPageData.title}</h2>
-                <div className="h-1 w-20 bg-[#c5a059] my-4"></div>
-              </div>
-              <div className="md:w-2/3 space-y-8">
-                {currentPageData.icon && <div>{currentPageData.icon}</div>}
-                <p className="text-xl md:text-3xl font-light leading-relaxed text-balance">
-                  {currentPageData.content}
-                </p>
-                {currentPageData.highlight && (
-                  <div className="inline-block border-l-4 border-[#c5a059] pl-6 py-2 mt-8">
-                    <span className="text-sm tracking-widest text-zinc-500 uppercase">Featured Highlight</span>
-                    <div className="text-xl font-bold italic">{currentPageData.highlight}</div>
-                  </div>
-                )}
-                
-                {currentPageData.type === 'contact' && (
-                  <div className="pt-10 flex gap-6">
-                    <button className="bg-[#c5a059] text-white px-8 py-4 text-xs tracking-widest hover:brightness-110 transition">預約諮詢</button>
-                    <button className="border border-zinc-700 px-8 py-4 text-xs tracking-widest hover:bg-zinc-800 transition">回到首頁</button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+        /* 選單樣式 */
+        .menu-overlay {
+            position: fixed; inset: 0; background: rgba(18,18,18,0.98); z-index: 100;
+            display: none; flex-direction: column; justify-content: center; padding: 10%;
+            color: white;
+        }
+        .menu-item { font-size: 3rem; margin: 1rem 0; cursor: pointer; transition: 0.3s; }
+        .menu-item:hover { color: var(--gold); padding-left: 20px; }
 
-        {/* 頁碼顯示 */}
-        <div className="absolute bottom-12 left-12 text-sm font-serif italic text-zinc-500">
-          {currentPage + 1} <span className="mx-2">/</span> {pages.length}
-        </div>
+        /* 海外亮點卡片 */
+        .travel-img { filter: grayscale(100%); transition: 0.5s; }
+        .active .travel-img { filter: grayscale(0%); scale: 1.05; }
+    </style>
+</head>
+<body>
 
-        {/* 控制按鈕 */}
-        <div className="absolute bottom-8 right-12 flex gap-4">
-          <button 
-            onClick={prevPage} 
-            disabled={currentPage === 0}
-            className={`p-4 border transition-all ${currentPage === 0 ? 'border-zinc-200 text-zinc-300 opacity-20' : 'border-zinc-400 hover:bg-[#c5a059] hover:border-[#c5a059] hover:text-white'}`}
-          >
-            <ChevronLeft />
-          </button>
-          <button 
-            onClick={nextPage}
-            disabled={currentPage === pages.length - 1}
-            className={`p-4 border transition-all ${currentPage === pages.length - 1 ? 'border-zinc-200 text-zinc-300 opacity-20' : 'border-zinc-400 hover:bg-[#c5a059] hover:border-[#c5a059] hover:text-white'}`}
-          >
-            <ChevronRight />
-          </button>
-        </div>
-      </main>
+    <!-- 頂部導覽 -->
+    <nav class="fixed top-0 w-full z-50 p-6 flex justify-between items-center mix-blend-difference text-white">
+        <div class="text-xl font-bold tracking-widest serif cursor-pointer" onclick="goToPage(0)">DU DU LONG</div>
+        <button onclick="toggleMenu(true)" class="p-2 border border-white/30 rounded-full">選單</button>
+    </nav>
 
-      {/* 視覺裝飾線 */}
-      <div className="fixed left-0 top-1/2 -translate-y-1/2 w-10 h-px bg-[#c5a059] opacity-30"></div>
-      <div className="fixed right-0 top-1/2 -translate-y-1/2 w-10 h-px bg-[#c5a059] opacity-30"></div>
+    <!-- 進度條 -->
+    <div class="fixed top-0 left-0 h-1 bg-[#c5a059] z-[60] transition-all duration-500" id="progress" style="width: 5%"></div>
 
+    <!-- 全螢幕選單 -->
+    <div class="menu-overlay" id="menu">
+        <button onclick="toggleMenu(false)" class="absolute top-10 right-10 text-4xl">✕</button>
+        <div class="text-xs tracking-[0.5em] text-zinc-500 mb-8 uppercase">Exhibition Menu</div>
+        <div class="menu-item serif" onclick="jumpToCategory(1)">01 生平故事</div>
+        <div class="menu-item serif" onclick="jumpToCategory(6)">02 專業成就</div>
+        <div class="menu-item serif" onclick="jumpToCategory(11)">03 海外亮點</div>
+        <div class="menu-item serif" onclick="jumpToCategory(17)">04 健康願景</div>
     </div>
-  );
-};
 
-export default App;
+    <!-- 內容容器 -->
+    <main id="content-container">
+        <!-- 頁面會由 JavaScript 動態生成 -->
+    </main>
+
+    <!-- 底部控制 -->
+    <div class="fixed bottom-10 right-10 flex gap-4 z-50">
+        <button onclick="changePage(-1)" class="p-4 border border-zinc-300 hover:bg-zinc-100 transition">←</button>
+        <button onclick="changePage(1)" class="p-4 bg-zinc-900 text-white hover:bg-zinc-700 transition">→</button>
+    </div>
+    <div class="fixed bottom-12 left-10 text-sm italic text-zinc-400 font-serif" id="page-number">01 / 22</div>
+
+    <script>
+        const pagesData = [
+            { cat: "HOME", title: "杜杜龍", sub: "一個關於跨界、健康與夢想的個人展覽", bg: "bg-zinc-950 text-white" },
+            // 生平故事 (1-5)
+            { cat: "STORY", title: "學術的奠基", sub: "曾任大學資管系教師，嚴謹的邏輯是我的核心。" },
+            { cat: "STORY", title: "創業的火花", sub: "白手起家創立第一間印刷店，學習市場的語言。" },
+            { cat: "STORY", title: "事業的版圖", sub: "擴展至三家連鎖店，並榮獲母校傑出校友。" },
+            { cat: "STORY", title: "杜阿嬤的守護", sub: "為了 90 歲阿嬤的健康，我開始尋找生命的轉機。" },
+            { cat: "STORY", title: "角色的轉換", sub: "從資管名師到健康管理師，這是一場溫暖的蛻變。" },
+            // 專業成就 (6-10)
+            { cat: "PROFESSIONAL", title: "北醫健康管理師", sub: "取得專業認證，用數據守護生命品質。" },
+            { cat: "PROFESSIONAL", title: "安麗紐崔萊代理", sub: "選擇全球領先品牌，因為品質是唯一的語言。" },
+            { cat: "PROFESSIONAL", title: "91年的科研力", sub: "深信紐崔萊溯源精神，從種子到成品嚴格把關。" },
+            { cat: "PROFESSIONAL", title: "有機農場的契機", sub: "與自然和諧共處，將大地的精華帶給每一位朋友。" },
+            { cat: "PROFESSIONAL", title: "團隊的領導者", sub: "不僅是代理產品，更是帶領夥伴走向更好的人生。" },
+            // 海外亮點 (11-16)
+            { cat: "TRAVEL", title: "寰宇世界：亮點", sub: "選擇一種生活方式，而不僅僅是一份職業。", bg: "bg-zinc-900 text-white" },
+            { cat: "TRAVEL", title: "西澳珀斯：酒莊", sub: "頂級酒莊包場午宴，感受南半球最純淨的陽光。", bg: "bg-zinc-800 text-white" },
+            { cat: "TRAVEL", title: "西澳珀斯：挑戰", sub: "高空滑索極限體驗，勇氣是跨向夢想的唯一路徑。", bg: "bg-zinc-900 text-white" },
+            { cat: "TRAVEL", title: "專屬榮耀：黃金幣", sub: "客製化紀念幣，見證我們在世界的足跡。", bg: "bg-zinc-800 text-white" },
+            { cat: "TRAVEL", title: "巴黎：凡爾賽宮", sub: "凡爾賽包場皇室晚宴，品味極致生活的浪漫。", bg: "bg-zinc-900 text-white" },
+            { cat: "TRAVEL", title: "巴黎：塞納河畔", sub: "在美酒與星光下，體驗安麗給予的最高尊重。", bg: "bg-zinc-800 text-white" },
+            // 健康願景 (17-21)
+            { cat: "VISION", title: "小水滴融入大海", sub: "個人力量有限，但團隊與系統的力量無邊無際。" },
+            { cat: "VISION", title: "守護與傳承", sub: "因為愛學習營養，因為健康我們擁抱真正的自由。" },
+            { cat: "VISION", title: "夢想的主動權", sub: "為夢想而忙碌，不要因忙碌而忘記為何夢想。" },
+            { cat: "VISION", title: "出走世界", sub: "誠邀您與我一同看見世界，成就非凡人生。" },
+            { cat: "CONTACT", title: "期待相遇", sub: "杜杜龍個人品牌展覽，感謝您的蒞臨。", bg: "bg-zinc-950 text-white" }
+        ];
+
+        let currentPage = 0;
+
+        function renderPages() {
+            const container = document.getElementById('content-container');
+            container.innerHTML = pagesData.map((p, i) => `
+                <div class="page flex items-center justify-center text-center p-10 ${p.bg || ''} ${i === 0 ? 'active' : ''}">
+                    <div class="max-w-4xl">
+                        <div class="text-[#c5a059] tracking-[0.5em] mb-4 text-xs">${p.cat}</div>
+                        <h1 class="text-5xl md:text-8xl serif font-bold mb-8 leading-tight">${p.title}</h1>
+                        <p class="text-xl md:text-2xl font-light opacity-80 leading-relaxed">${p.sub}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function changePage(dir) {
+            const total = pagesData.length;
+            const target = currentPage + dir;
+            if (target >= 0 && target < total) {
+                goToPage(target);
+            }
+        }
+
+        function goToPage(index) {
+            const pages = document.querySelectorAll('.page');
+            pages[currentPage].classList.remove('active');
+            currentPage = index;
+            pages[currentPage].classList.add('active');
+            
+            // 更新進度與頁碼
+            document.getElementById('progress').style.width = `${((index + 1) / pagesData.length) * 100}%`;
+            document.getElementById('page-number').innerText = `${String(index + 1).padStart(2, '0')} / ${pagesData.length}`;
+        }
+
+        function toggleMenu(show) {
+            document.getElementById('menu').style.display = show ? 'flex' : 'none';
+        }
+
+        function jumpToCategory(index) {
+            goToPage(index);
+            toggleMenu(false);
+        }
+
+        window.onload = renderPages;
+    </script>
+</body>
+</html>
+
