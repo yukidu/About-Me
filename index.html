@@ -3,399 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>杜杜龍 DU DU LONG | 活力生活展覽</title>
+    <title>杜杜龍 | DU DU LONG - 非凡人生特展</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
-        :root { 
-            --energy-yellow: #FFD700; 
-            --soft-bg: #FFFFFF;
-            --text-main: #2D2D2D;
+        :root {
+            --primary-orange: #FF9F1C;
+            --primary-blue: #2EC4B6;
+            --bg-bright: #FFFFFF;
+            --text-dark: #232323;
         }
-        body { 
-            font-family: 'Noto Sans TC', sans-serif; 
-            background-color: var(--soft-bg); 
-            color: var(--text-main);
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-bright);
+            color: var(--text-dark);
             overflow-x: hidden;
         }
         .serif { font-family: 'Noto Serif TC', serif; }
-
-        /* 水平滾動容器 */
-        .gallery-wrapper {
-            display: flex;
-            width: fit-content;
-            height: 100vh;
-            align-items: center;
-            padding-left: 10vw;
-            padding-right: 20vw;
+        
+        /* 導覽列 */
+        .nav-link {
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s;
         }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 0; height: 2px;
+            background: var(--primary-orange);
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after { width: 100%; }
 
-        .card {
-            flex-shrink: 0;
-            width: 80vw;
-            max-width: 500px;
-            height: 70vh;
-            margin-right: 5vw;
-            background: white;
-            border-radius: 4px;
-            box-shadow: 20px 20px 60px rgba(0,0,0,0.05);
-            padding: 3rem;
+        /* 卡片與佈局 */
+        .section-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 5rem 2rem;
+            position: relative;
+        }
+        .image-reveal {
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 20px 20px 0px rgba(255, 159, 28, 0.1);
+        }
+        .bg-accent { background: linear-gradient(135deg, #FF9F1C 0%, #FFBF69 100%); }
+        .text-accent { color: var(--primary-orange); }
+
+        /* 滑動指示 */
+        .scroll-indicator {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            border-top: 8px solid var(--energy-yellow);
+            gap: 1.5rem;
+            z-index: 40;
         }
-
-        .category-label {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            position: absolute;
-            left: -40px;
-            top: 20px;
-            font-size: 0.75rem;
-            letter-spacing: 0.3em;
-            color: #ccc;
-        }
-
-        .photo-frame {
-            width: 100%;
-            height: 250px;
-            background-size: cover;
-            background-position: center;
-            margin-bottom: 2rem;
-            filter: saturate(1.2);
-        }
-
-        /* 選單與導航 */
-        .nav-btn {
-            background: var(--energy-yellow);
-            color: black;
-            padding: 0.5rem 1.5rem;
-            border-radius: 99px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        .nav-btn:hover { transform: scale(1.1); box-shadow: 0 10px 20px rgba(255,215,0,0.3); }
-
-        .energy-gradient {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-    </style>
-</head>
-<body class="no-scrollbar">
-
-    <!-- 頂部選單 -->
-    <nav class="fixed top-0 w-full z-50 p-8 flex justify-between items-center bg-white/50 backdrop-blur-sm">
-        <div class="text-2xl font-bold tracking-[0.2em] serif energy-gradient cursor-pointer">DU DU LONG</div>
-        <div class="hidden md:flex gap-4">
-            <button onclick="scrollToCat('STORY')" class="nav-btn">生平故事</button>
-            <button onclick="scrollToCat('PROFESSIONAL')" class="nav-btn">專業成就</button>
-            <button onclick="scrollToCat('TRAVEL')" class="nav-btn">海外亮點</button>
-            <button onclick="scrollToCat('VISION')" class="nav-btn">健康願景</button>
-        </div>
-    </nav>
-
-    <!-- 主展示區 -->
-    <div class="gallery-wrapper" id="master-gallery">
-        
-        <!-- 首頁 -->
-        <div class="card" style="border-top: none; justify-content: center; background: transparent; shadow: none; box-shadow: none;">
-            <h2 class="text-xs tracking-[0.5em] text-yellow-600 mb-4">杜杜龍個人品牌展覽</h2>
-            <h1 class="text-6xl md:text-8xl serif font-bold mb-6">出走，<br>看見世界。</h1>
-            <p class="text-gray-400 tracking-widest">向右滑動，展開我的生命故事與健康願景</p>
-            <div class="mt-10 flex items-center gap-4">
-                <div class="w-12 h-px bg-yellow-400"></div>
-                <span class="text-sm italic">Swipe to explore</span>
-            </div>
-        </div>
-
-        <!-- 20+ 內容頁面 -->
-        <script>
-            const data = [
-                // 生平故事
-                { cat: 'STORY', title: '學術的起點', sub: '曾任大學資管系教師，嚴謹的教學精神成就了我對品質的堅持。', img: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800' },
-                { cat: 'STORY', title: '創業的勇氣', sub: '不怕吃苦，怕苦一輩子。白手起家創立第一間印刷店。', img: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=800' },
-                { cat: 'STORY', title: '三家連鎖經營', sub: '最高紀錄同時管理三家印刷店，榮獲母校傑出校友。', img: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800' },
-                { cat: 'STORY', title: '杜許彩鑾阿嬤', sub: '為了守護 90 歲阿嬤的健康，我開始學習真正的預防醫學。', img: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=800' },
-                { cat: 'STORY', title: '身分的轉型', sub: '從資管名師轉化為北醫認證健康管理師，使命感油然而生。', img: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?q=80&w=800' },
-                
-                // 專業成就
-                { cat: 'PROFESSIONAL', title: '北醫健康管理師', sub: '以資管的數據思維，精準管理每一份健康。', img: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800' },
-                { cat: 'PROFESSIONAL', title: '安麗紐崔萊代理', sub: '選擇全球領先品牌，因為健康不能有任何妥協。', img: 'https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?q=80&w=800' },
-                { cat: 'PROFESSIONAL', title: '91年科研力量', sub: '紐崔萊 91 年的底蘊，從種子到成品的嚴格把關。', img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800' },
-                { cat: 'PROFESSIONAL', title: '自有有機農場', sub: '全球唯一擁有自有有機農場的營養品牌。', img: 'https://images.unsplash.com/photo-1464226184884-fa280b6708ec?q=80&w=800' },
-                { cat: 'PROFESSIONAL', title: '健康傳承使命', sub: '代理的不只是產品，而是一套完整的生命品質方案。', img: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800' },
-
-                // 海外亮點
-                { cat: 'TRAVEL', title: '西澳珀斯：亮點', sub: '「選擇行業，等於選擇生活方式。」', img: 'https://images.unsplash.com/photo-1529108190281-9a4f620bc2d8?q=80&w=800' },
-                { cat: 'TRAVEL', title: '酒莊包場午宴', sub: '享受頂級酒莊包場款待，這是屬於我們的生活高度。', img: 'https://images.unsplash.com/photo-1506377247377-2a5b3b0ca7df?q=80&w=800' },
-                { cat: 'TRAVEL', title: '高空滑索挑戰', sub: '在珀斯的天際線上，挑戰自我勇氣的極限。', img: 'https://images.unsplash.com/photo-1533669955142-6a73332af4db?q=80&w=800' },
-                { cat: 'TRAVEL', title: '客製黃金幣', sub: '專屬的榮耀認可，這是金錢買不到的尊榮。', img: 'https://images.unsplash.com/photo-1518458084722-67377ec659ca?q=80&w=800' },
-                { cat: 'TRAVEL', title: '凡爾賽宮晚宴', sub: '巴黎凡爾賽宮包場，體驗皇室般的頂級尊重。', img: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800' },
-                { cat: 'TRAVEL', title: '塞納河畔微醺', sub: '五星級飯店驚喜與塞納河美景，生活本該如此美好。', img: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=800' },
-
-                // 健康願景
-                { cat: 'VISION', title: '小水滴融入大海', sub: '小水滴要不被蒸發，就要融入大海（寰宇系統）。', img: 'https://images.unsplash.com/photo-1484627147104-f5197bcd6651?q=80&w=800' },
-                { cat: 'VISION', title: '守護家人的願景', sub: '因為愛學習營養，因為健康擁抱真正的自由。', img: 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?q=80&w=800' },
-                { cat: 'VISION', title: '為夢想而忙碌', sub: '要為夢想而忙碌，不要因忙碌而忘記夢想。', img: 'https://images.unsplash.com/photo-1493612276216-ee3925520721?q=80&w=800' },
-                { cat: 'VISION', title: '一起出走世界', sub: '歡迎聯絡杜杜龍，一起看見不凡的人生意義。', img: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=800' }
-            ];
-
-            const gallery = document.getElementById('master-gallery');
-            data.forEach((item, i) => {
-                const card = document.createElement('div');
-                card.className = `card section-${item.cat}`;
-                card.innerHTML = `
-                    <div class="category-label">${item.cat}</div>
-                    <div class="photo-frame" style="background-image: url('${item.img}')"></div>
-                    <div>
-                        <h2 class="text-3xl serif font-bold mb-4">${item.title}</h2>
-                        <p class="text-gray-500 leading-loose">${item.sub}</p>
-                    </div>
-                    <div class="text-xs text-gray-300 mt-6">PAGE ${String(i+1).padStart(2, '0')}</div>
-                `;
-                gallery.appendChild(card);
-            });
-        </script>
-    </div>
-
-    <!-- 頁尾指示 -->
-    <div class="fixed bottom-10 left-10 text-xs tracking-widest text-gray-300">
-        SCROLL HORIZONTALLY TO DISCOVER
-    </div>
-
-    <script>
-        gsap.registerPlugin(ScrollTrigger);
-
-        // 水平滾動邏輯
-        const gallery = document.getElementById('master-gallery');
-        
-        gsap.to(gallery, {
-            x: () => -(gallery.scrollWidth - window.innerWidth),
-            ease: "none",
-            scrollTrigger: {
-                trigger: "body",
-                start: "top top",
-                end: () => `+=${gallery.scrollWidth}`,
-                scrub: 1,
-                pin: true,
-                invalidateOnRefresh: true,
-            }
-        });
-
-        // 卡片入場動畫
-        gsap.utils.toArray(".card").forEach(card => {
-            gsap.from(card, {
-                y: 50,
-                opacity: 0,
-                duration: 1,
-                scrollTrigger: {
-                    trigger: card,
-                    containerAnimation: gsap.to(gallery, { x: -(gallery.scrollWidth - window.innerWidth) }), // 修正為容器動畫同步
-                    start: "left 90%",
-                    toggleActions: "play none none reverse"
-                }
-            });
-        });
-
-        // 分類跳轉功能
-        function scrollToCat(cat) {
-            const firstCard = document.querySelector(`.section-${cat}`);
-            if (firstCard) {
-                const scrollPos = firstCard.offsetLeft;
-                window.scrollTo({
-                    top: scrollPos,
-                    behavior: 'smooth'
-                });
-            }
-        }
-    </script>
-</body>
-</html>        .menu-link { font-size: 2.5rem; margin: 1rem 0; cursor: pointer; transition: 0.3s; opacity: 0.6; }
-        .menu-link:hover { opacity: 1; color: var(--gold); transform: scale(1.1); }
-
-        /* 進度條 */
-        .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); margin: 10px 0; cursor: pointer; }
-        .progress-dot.active { background: var(--gold); transform: scale(1.5); }
+        .dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid #ccc; transition: 0.3s; }
+        .dot.active { background: var(--primary-orange); border-color: var(--primary-orange); transform: scale(1.5); }
     </style>
 </head>
 <body>
 
-    <!-- 導覽列 -->
-    <nav class="fixed top-0 w-full z-50 p-8 flex justify-between items-center">
-        <div class="text-2xl font-bold tracking-widest serif cursor-pointer text-white" onclick="goToSlide(0)">DU DU LONG</div>
-        <div class="flex items-center gap-6">
-            <span class="hidden md:block text-xs tracking-widest opacity-60 uppercase" id="cat-display">HOME</span>
-            <button onclick="toggleMenu(true)" class="p-3 bg-white/10 rounded-full hover:bg-white/20 transition backdrop-blur-md">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-            </button>
+    <!-- 導覽選單 -->
+    <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md px-8 py-6 flex justify-between items-center border-b border-gray-100">
+        <div class="text-2xl font-bold tracking-tighter serif text-accent cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">DU DU LONG</div>
+        <div class="hidden md:flex gap-8 text-sm tracking-widest font-bold">
+            <a href="#biography" class="nav-link">生平故事</a>
+            <a href="#professional" class="nav-link">專業成就</a>
+            <a href="#travel" class="nav-link">海外亮點</a>
+            <a href="#vision" class="nav-link">健康願景</a>
         </div>
     </nav>
 
-    <!-- 右側分頁點 -->
-    <div class="fixed right-8 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col" id="dots-container"></div>
+    <!-- 滾動點指示器 -->
+    <div class="scroll-indicator" id="dot-nav"></div>
 
-    <!-- 全螢幕選單 -->
-    <div id="menu-overlay">
-        <button onclick="toggleMenu(false)" class="absolute top-10 right-10 text-4xl">✕</button>
-        <div class="menu-link serif" onclick="jump(1)">生平故事 STORY</div>
-        <div class="menu-link serif" onclick="jump(6)">專業成就 PROFESSIONAL</div>
-        <div class="menu-link serif" onclick="jump(12)">海外亮點 TRAVEL</div>
-        <div class="menu-link serif" onclick="jump(19)">健康願景 VISION</div>
-    </div>
+    <!-- 1. Hero 頁面 -->
+    <section class="section-container bg-white">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div class="animate-content">
+                <h2 class="text-gray-400 tracking-[0.4em] mb-4 text-sm font-bold">A JOURNEY OF ENERGY</h2>
+                <h1 class="text-7xl md:text-9xl serif font-bold mb-8 leading-tight">杜杜龍</h1>
+                <p class="text-xl text-gray-500 leading-relaxed max-w-md">
+                    從大學教師到健康管理師，從台灣市場到全球凡爾賽宮。這是一場關於夢想、健康與出走的展覽。
+                </p>
+                <div class="mt-12 flex gap-4">
+                    <a href="#biography" class="bg-accent text-white px-8 py-4 rounded-full font-bold shadow-lg hover:shadow-orange-200 transition">探索故事</a>
+                </div>
+            </div>
+            <div class="image-reveal aspect-[4/5] bg-gray-100">
+                <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover" alt="杜杜龍 專業形象">
+            </div>
+        </div>
+    </section>
 
-    <!-- 主展示區 -->
-    <div id="wrapper">
-        <!-- 頁面由 JS 動態渲染 -->
-    </div>
+    <!-- 2. 生平故事 (1-5 頁內容聚合) -->
+    <section id="biography" class="section-container bg-zinc-50">
+        <div class="max-w-6xl mx-auto">
+            <div class="mb-20">
+                <span class="text-accent font-bold tracking-widest italic">01 BIOGRAPHY</span>
+                <h2 class="text-5xl serif mt-4">從學術到創業的跨界軌跡</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-10 rounded-2xl shadow-sm border-t-4 border-orange-400">
+                    <h3 class="text-xl serif font-bold mb-4">學術的起點</h3>
+                    <p class="text-gray-500 leading-loose">曾任大學資管系教師，在程式與教學中鍛鍊嚴謹邏輯。這份對細節的追求，成就了後來的事業品質。</p>
+                </div>
+                <div class="bg-white p-10 rounded-2xl shadow-sm border-t-4 border-orange-400 translate-y-8">
+                    <h3 class="text-xl serif font-bold mb-4">連鎖創業夢</h3>
+                    <p class="text-gray-500 leading-loose">「不怕吃苦，怕苦一輩子。」白手起家創立三家印刷店，更榮獲母校傑出校友的榮耀肯定。</p>
+                </div>
+                <div class="bg-white p-10 rounded-2xl shadow-sm border-t-4 border-orange-400">
+                    <h3 class="text-xl serif font-bold mb-4">為了守護家人</h3>
+                    <p class="text-gray-500 leading-loose">因為愛，我開始學習營養。為了守護 90 歲<b>杜許彩鑾（杜阿嬤）</b>的健康，決定全力投入預防醫學。</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <!-- 控制按鈕 -->
-    <div class="fixed bottom-10 right-10 z-50 flex gap-4">
-        <button onclick="nextSlide(-1)" class="p-4 rounded-full border border-white/20 hover:bg-white/10 transition">↑</button>
-        <button onclick="nextSlide(1)" class="p-4 rounded-full bg-white text-black hover:bg-gray-200 transition">↓</button>
-    </div>
+    <!-- 3. 專業成就 (6-11 頁內容聚合) -->
+    <section id="professional" class="section-container bg-white">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-16">
+            <div class="md:w-1/2 image-reveal aspect-square">
+                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover" alt="專業健康管理">
+            </div>
+            <div class="md:w-1/2">
+                <span class="text-accent font-bold tracking-widest italic">02 PROFESSIONAL</span>
+                <h2 class="text-5xl serif mt-4 mb-8">精準守護生命質量</h2>
+                <div class="space-y-8">
+                    <div class="flex gap-6">
+                        <div class="text-3xl font-bold text-orange-200">01</div>
+                        <div>
+                            <h4 class="text-xl font-bold mb-2">北醫認證健康管理師</h4>
+                            <p class="text-gray-500">結合 IT 資管背景，用數據精準管理健康。我們不只賣產品，更提供整套生命品質方案。</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-6">
+                        <div class="text-3xl font-bold text-orange-200">02</div>
+                        <div>
+                            <h4 class="text-xl font-bold mb-2">安麗紐崔萊 91 年科研</h4>
+                            <p class="text-gray-500">代理全球第一品牌，深信紐崔萊溯源精神。從種子到成品，每一份營養都是科學與自然的承諾。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 海外亮點 (12-18 頁內容聚合 - 重點強化) -->
+    <section id="travel" class="section-container bg-orange-50 overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <span class="text-accent font-bold tracking-widest italic">03 HIGHLIGHTS</span>
+                <h2 class="text-6xl serif mt-4">選擇一種不凡的生活方式</h2>
+                <p class="text-gray-400 mt-4 italic">「選擇行業，等於選擇生活方式。」</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- 西澳珀斯 -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-xl group">
+                    <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1529108190281-9a4f620bc2d8?auto=format&fit=crop&q=80&w=1200" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt="西澳珀斯">
+                    </div>
+                    <div class="p-10">
+                        <h3 class="text-3xl serif font-bold mb-6">西澳珀斯：極致奢華</h3>
+                        <ul class="space-y-4 text-gray-500">
+                            <li>● 酒莊包場尊榮午宴，體驗南半球暖陽</li>
+                            <li>● 高空滑索極限挑戰，在天際線看見勇氣</li>
+                            <li>● 獲贈專屬客製黃金紀念幣，榮耀無價</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- 法國巴黎 -->
+                <div class="bg-white rounded-3xl overflow-hidden shadow-xl group">
+                    <div class="h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=1200" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt="巴黎凡爾賽">
+                    </div>
+                    <div class="p-10">
+                        <h3 class="text-3xl serif font-bold mb-6">巴黎：凡爾賽仲夏夜</h3>
+                        <ul class="space-y-4 text-gray-500">
+                            <li>● 凡爾賽宮包場皇室晚宴，品味歷史尊榮</li>
+                            <li>● 塞納河深度巡航，在星光美酒下暢談</li>
+                            <li>● 五星級飯店驚喜禮遇，體現對人的極致尊重</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 健康願景 (19-22 頁內容聚合) -->
+    <section id="vision" class="section-container bg-white">
+        <div class="max-w-4xl mx-auto text-center space-y-12">
+            <span class="text-accent font-bold tracking-widest italic">04 VISION</span>
+            <h2 class="text-6xl md:text-8xl serif font-bold leading-tight">小水滴要不被蒸發，<br>就要融入大海。</h2>
+            <div class="h-2 w-24 bg-accent mx-auto"></div>
+            <p class="text-2xl font-light text-gray-600 leading-relaxed">
+                要為夢想而忙碌，不要因忙碌而忘記夢想。<br>
+                出走，世界就在眼前。邀請您與杜杜龍一同成就非凡人生。
+            </p>
+            <div class="pt-10">
+                <a href="#" class="bg-black text-white px-12 py-5 rounded-full font-bold tracking-[0.2em] text-sm hover:bg-orange-600 transition">聯絡杜杜龍先生</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 頁尾 -->
+    <footer class="py-12 border-t border-gray-100 text-center text-xs text-gray-300 tracking-[0.3em]">
+        © 2024 DU DU LONG. ALL RIGHTS RESERVED. INSPIRED BY FUBON ART MUSEUM.
+    </footer>
 
     <script>
-        gsap.registerPlugin(Observer);
+        gsap.registerPlugin(ScrollTrigger);
 
-        const slidesData = [
-            { cat: "HOME", title: "杜杜龍", sub: "從學術到寰宇的跨界之旅", img: "http://googleusercontent.com/image_collection/image_retrieval/17136044356801624389" },
-            
-            // --- 故事 STORY (1-5) ---
-            { cat: "STORY", title: "學術的奠基", sub: "曾任大學資管系教師，嚴謹的邏輯是我的核心。", img: "https://images.unsplash.com/photo-1454165833767-027ffea9e77b?q=80&w=1200" },
-            { cat: "STORY", title: "創業的火花", sub: "不怕吃吃苦，怕苦一輩子。白手起家創立第一間印刷店。", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1200" },
-            { cat: "STORY", title: "事業的版圖", sub: "最高紀錄同時管理三家連鎖印刷店，榮獲母校傑出校友。", img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=1200" },
-            { cat: "STORY", title: "轉折：守護杜阿嬤", sub: "為了 90 歲杜阿嬤（杜許彩鑾）的健康，我開始尋找生命的轉機。", img: "http://googleusercontent.com/image_collection/image_retrieval/17437467074435059722" },
-            { cat: "STORY", title: "角色的轉換", sub: "從資管名師到健康管理師，這是一場溫暖的蛻變。", img: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?q=80&w=1200" },
+        // 初始化導航點
+        const sections = ['biography', 'professional', 'travel', 'vision'];
+        const navContainer = document.getElementById('dot-nav');
+        
+        sections.forEach((id, i) => {
+            const dot = document.createElement('div');
+            dot.className = `dot section-dot-${id}`;
+            dot.onclick = () => document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            navContainer.appendChild(dot);
 
-            // --- 專業 PROFESSIONAL (6-11) ---
-            { cat: "PROFESSIONAL", title: "北醫健康管理師", sub: "取得台北醫學大學專業認證，用數據守護生命品質。", img: "https://images.unsplash.com/photo-1454165833767-027ffea9e77b?q=80&w=1200" },
-            { cat: "PROFESSIONAL", title: "安麗紐崔萊代理", sub: "代理全球第一品牌，將健康主動權還給每一個人。", img: "https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?q=80&w=1200" },
-            { cat: "PROFESSIONAL", title: "91年的科研力", sub: "深信紐崔萊溯源精神，從種子到成品嚴格把關。", img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200" },
-            { cat: "PROFESSIONAL", title: "有機農場的契機", sub: "全球唯一自有有機農場，每一口營養都是純淨。", img: "https://images.unsplash.com/photo-1464226184884-fa280b6708ec?q=80&w=1200" },
-            { cat: "PROFESSIONAL", title: "健康管理：服務實績", sub: "結合 IT 管理與健康專業，提供客製化健康方案。", img: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?q=80&w=1200" },
-            { cat: "PROFESSIONAL", title: "專業帶領：團隊合作", sub: "不僅是代理產品，更是傳遞一份完整的健康計畫。", img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200" },
-
-            // --- 海外亮點 TRAVEL (12-18) ---
-            { cat: "TRAVEL", title: "寰宇世界：生活的藝術", sub: "「選擇行業，等於選擇生活方式。」", img: "http://googleusercontent.com/image_collection/image_retrieval/15672385993975116465" },
-            { cat: "TRAVEL", title: "西澳珀斯：頂級酒莊", sub: "包場酒莊享受尊榮午宴，感受大地的饋贈。", img: "https://images.unsplash.com/photo-1506377247377-2a5b3b0ca7df?q=80&w=1200" },
-            { cat: "TRAVEL", title: "西澳珀斯：極限挑戰", sub: "高空滑索刺激體驗，超越自我極限。", img: "https://images.unsplash.com/photo-1533669955142-6a73332af4db?q=80&w=1200" },
-            { cat: "TRAVEL", title: "專屬榮耀：黃金幣", sub: "獨一無二的客製化黃金幣，見證輝煌里程。", img: "http://googleusercontent.com/image_collection/image_retrieval/11715667310420396149" },
-            { cat: "TRAVEL", title: "巴黎：凡爾賽仲夏夜", sub: "包場凡爾賽宮，品味皇室等級的仲夏晚宴。", img: "http://googleusercontent.com/image_collection/image_retrieval/8035048486259357941" },
-            { cat: "TRAVEL", title: "巴黎：塞納河畔漫遊", sub: "在美酒與星光下，體驗安麗給予的最高尊重。", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=1200" },
-            { cat: "TRAVEL", title: "極致款待：五星級驚喜", sub: "每一處細節都展現了對生活品質的追求。", img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200" },
-
-            // --- 願景 VISION (19-22) ---
-            { cat: "VISION", title: "小水滴融入大海", sub: "個人力量有限，但團隊與系統的力量無邊無際。", img: "http://googleusercontent.com/image_collection/image_retrieval/11715667310420396149" },
-            { cat: "VISION", title: "守護與傳承", sub: "因為愛學習營養，因為健康我們擁抱真正的自由。", img: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?q=80&w=1200" },
-            { cat: "VISION", title: "為夢想而忙碌", sub: "要為夢想而忙碌，不要因忙碌而忘記為何夢想。", img: "https://images.unsplash.com/photo-1493612276216-ee3925520721?q=80&w=1200" },
-            { cat: "VISION", title: "誠摯邀請", sub: "與杜杜龍一同出走世界，遇見更好的自己。", img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1200" }
-        ];
-
-        let currentIndex = -1;
-        const wrapper = document.getElementById('wrapper');
-        const dotsContainer = document.getElementById('dots-container');
-        let animating = false;
-
-        // 渲染 HTML
-        function init() {
-            slidesData.forEach((slide, i) => {
-                const section = document.createElement('div');
-                section.className = 'section';
-                section.innerHTML = `
-                    <div class="section-bg" style="background-image: url('${slide.img}')"></div>
-                    <div class="content-box">
-                        <div class="text-[#c5a059] tracking-[0.5em] mb-6 text-xs font-bold slide-cat">${slide.cat}</div>
-                        <h1 class="text-5xl md:text-8xl serif font-bold mb-8 leading-tight slide-title">${slide.title}</h1>
-                        <p class="text-xl md:text-2xl font-light opacity-80 leading-relaxed slide-sub">${slide.sub}</p>
-                        <div class="mt-12 h-px w-20 bg-[#c5a059] mx-auto slide-line"></div>
-                    </div>
-                `;
-                wrapper.appendChild(section);
-
-                const dot = document.createElement('div');
-                dot.className = 'progress-dot';
-                dot.onclick = () => goToSlide(i);
-                dotsContainer.appendChild(dot);
+            ScrollTrigger.create({
+                trigger: `#${id}`,
+                start: "top center",
+                end: "bottom center",
+                onEnter: () => activateDot(id),
+                onEnterBack: () => activateDot(id)
             });
-            goToSlide(0);
+        });
+
+        function activateDot(id) {
+            document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+            document.querySelector(`.section-dot-${id}`).classList.add('active');
         }
 
-        function goToSlide(index) {
-            if (animating || index === currentIndex) return;
-            animating = true;
-
-            const sections = document.querySelectorAll('.section');
-            const dots = document.querySelectorAll('.progress-dot');
-            const direction = index > currentIndex ? 1 : -1;
-
-            const currentSlide = sections[currentIndex];
-            const nextSlide = sections[index];
-
-            // 更新 UI 狀態
-            document.getElementById('cat-display').innerText = slidesData[index].cat;
-            dots.forEach((d, i) => d.classList.toggle('active', i === index));
-
-            const tl = gsap.timeline({
-                onComplete: () => {
-                    animating = false;
-                    currentIndex = index;
+        // 動態效果
+        gsap.utils.toArray('.section-container').forEach(section => {
+            gsap.from(section.querySelectorAll('.image-reveal'), {
+                y: 100,
+                opacity: 0,
+                duration: 1.2,
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 70%"
                 }
             });
 
-            // 轉場動畫
-            if (currentSlide) {
-                tl.to(currentSlide, { y: -50 * direction, opacity: 0, scale: 0.95, duration: 0.8, ease: "power2.inOut", visibility: "hidden" });
-            }
-
-            tl.fromTo(nextSlide, 
-                { y: 50 * direction, opacity: 0, scale: 1.05, visibility: "visible" },
-                { y: 0, opacity: 1, scale: 1, duration: 1, ease: "expo.out" },
-                "-=0.5"
-            );
-
-            // 內文細節動畫
-            tl.from(nextSlide.querySelectorAll('.slide-cat, .slide-title, .slide-sub, .slide-line'), {
-                y: 30, opacity: 0, stagger: 0.1, duration: 0.8, ease: "power3.out"
-            }, "-=0.6");
-        }
-
-        function nextSlide(dir) {
-            let next = currentIndex + dir;
-            if (next >= 0 && next < slidesData.length) goToSlide(next);
-        }
-
-        // 捲動偵測
-        Observer.create({
-            target: window,
-            type: "wheel,touch,pointer",
-            wheelSpeed: -1,
-            onUp: () => nextSlide(-1),
-            onDown: () => nextSlide(1),
-            tolerance: 10,
-            preventDefault: true
+            gsap.from(section.querySelectorAll('h2, h3, p, .grid > div'), {
+                y: 50,
+                opacity: 0,
+                stagger: 0.2,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 60%"
+                }
+            });
         });
-
-        function toggleMenu(show) {
-            const menu = document.getElementById('menu-overlay');
-            menu.style.display = show ? 'flex' : 'none';
-            if(show) {
-                gsap.from(".menu-link", { y: 50, opacity: 0, stagger: 0.1, duration: 0.5 });
-            }
-        }
-
-        function jump(idx) {
-            toggleMenu(false);
-            goToSlide(idx);
-        }
-
-        window.onload = init;
     </script>
 </body>
 </html>
